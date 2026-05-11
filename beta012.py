@@ -78,43 +78,6 @@ class SysBot:
         if choice in self.__commands:
             self.__commands[choice]()
         
-        # while True:
-        #     self.clear_screen()
-
-        #     console.print("[bold cyan]Main Menu:[/bold cyan]")
-        #     console.print("[green]1. View Tasks[/green]")
-        #     console.print("[green]2. Add Task[/green]")
-        #     console.print("[green]3. Display Bot Info[/green]")
-        #     console.print("[green]4. Exit[/green]")
-
-        #     choice = input("\nEnter your choice: ")
-
-        #     if choice == "1":
-        #         self.clear_screen()
-        #         self.view_tasks()
-        #         input("\nPress Enter to continue...")
-
-        #     elif choice == "2":
-        #         self.clear_screen()
-        #         self.add_task()
-        #         input("\nPress Enter to continue...")
-
-        #     elif choice == "3":
-        #         self.clear_screen()
-        #         self.display_info()
-        #         input("\nPress Enter to continue...")
-
-        #     elif choice == "4":
-        #         console.print("[bold red]Exiting...[/bold red]")
-        #         break
-
-        # else:
-        #     console.print(
-        #         "[bold red]Invalid choice! Please try again.[/bold red]"
-        #     )
-        #     time.sleep(1)
-
-
 my_bot = SysBot("SysBot", "0.1.2", "Nefrius")
 
 my_bot.welcome_message()
