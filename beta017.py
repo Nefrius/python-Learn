@@ -2,50 +2,48 @@ from contextlib import contextmanager
 import os
 import time
 import psutil
-import rich as rich
 from rich.console import Console
+import GPUtil
 
-print = Console().print
 
-class SystemInformation():
-    def __init__(self, cpu=None, ram=None, disk=None):
-        self.cpu = cpu if cpu is not None else psutil.cpu_percent(interval=1)
-        self.ram = ram if ram is not None else psutil.virtual_memory().percent
-        self.disk = disk if disk is not None else psutil.disk_usage('/').percent
+console = Console()
+print = console.print
 
-class CpuInfo(SystemInformation):
-    def __init__(self, cpu=None):
-        super().__init__(cpu=cpu)
+gpus = GPUtil.getGPUs()
 
-class RamInfo(SystemInformation):
-    def __init__(self, ram=None):
-        super().__init__(ram=ram)
+class SystemInformation:
+    def __init__(self):
+        self.cpu = psutil.cpu_percent(interval=1)
+        self.ram = psutil.virtual_memory().percent
+        self.disk = psutil.disk_usage('/').percent
         
-class DiskInfo(SystemInformation):
-    def __init__(self, disk=None):
-        super().__init__(disk=disk)
-
+        if gpus:
+            gpu = gpus[0]
+            self.gpu_load = gpu.load * 100
+            self.gpu_memory_used = gpu.memoryUsed
+            self.gpu_memory_total = gpu.memoryTotal
+            self.gpu_memory_percent = gpu.memoryUtil * 100
+        else:
+            self.gpu_load = 0
+            self.gpu_memory_percent = 0
 
 @contextmanager
 def display_system_info():
-    print("[bold green]Gathering System Information...[/bold green]")
+    console.print("[bold green]Gathering System Information...[/bold green]")
     start_time = time.time()
+    
     try:
         yield
-            
     finally:
-        print(f"[bold green]CPU Usage:[/bold green] {cpu_info.cpu}%")
-        print(f"[bold green]RAM Usage:[/bold green] {ram_info.ram}%")
-        print(f"[bold green]Disk Usage:[/bold green] {disk_info.disk}%")
-    
-    elapsed = time.time() - start_time
-    print(f"[bold green]System Information gathered in {elapsed:.2f} seconds[/bold green]")
-
+        console.print(f"[bold green]CPU Usage :[/bold green] {system_info.cpu:.1f}%")
+        console.print(f"[bold green]RAM Usage :[/bold green] {system_info.ram:.1f}%")
+        console.print(f"[bold green]Disk Usage:[/bold green] {system_info.disk:.1f}%")
+        console.print(f"[bold green]GPU Load  :[/bold green] {system_info.gpu_load:.1f}%")
+        console.print(f"[bold green]GPU Memory:[/bold green] {system_info.gpu_memory_percent:.1f}%")
+        
+        elapsed = time.time() - start_time
+        console.print(f"[bold green]Completed in {elapsed:.2f} seconds[/bold green]")
+        
 with display_system_info():
     system_info = SystemInformation()
-    cpu_info = CpuInfo()
-    ram_info = RamInfo()
-    disk_info = DiskInfo()
-
-
-display_system_info()
+    console.print("[bold green]System Information gathered successfully![/bold green]")
